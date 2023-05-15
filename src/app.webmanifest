@@ -40,5 +40,11 @@
     ],
     "launch_handler": {
         "client_mode": "focus-existing"
-    }
+    },
+    "capture_links": "existing_client_event",
+    "url_handlers": [
+        {
+            "origin": "https://dnd-tokenizer-41471e.netlify.app"
+        }
+    ]
 }
