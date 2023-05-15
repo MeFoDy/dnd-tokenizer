@@ -8,8 +8,7 @@
     "start": "parcel",
     "sw": "workbox generateSW",
     "clean": "rm -rf dist",
-    "build": "npm run clean && parcel build && npm run sw",
-    "deploy": "gh-pages -d dist"
+    "build": "npm run clean && parcel build && npm run sw"
   },
   "keywords": [],
   "author": "https://github.com/mefody",
@@ -18,12 +17,12 @@
     "@parcel/packager-raw-url": "^2.8.3",
     "@parcel/transformer-webmanifest": "^2.8.3",
     "@types/fabric": "^5.3.2",
-    "gh-pages": "^5.0.0",
     "workbox-cli": "^6.5.4"
   },
   "dependencies": {
     "fabric": "^6.0.0-beta5",
-    "workbox-window": "^6.5.4",
-    "parcel": "^2.8.3"
+    "fontfaceobserver": "^2.3.0",
+    "parcel": "^2.8.3",
+    "workbox-window": "^6.5.4"
   }
 }

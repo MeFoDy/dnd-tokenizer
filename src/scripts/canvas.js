@@ -1,10 +1,60 @@
 import * as fabric from 'fabric';
+import * as FontFaceObserver from 'fontfaceobserver';
+
+class DFonts {
+    constructor() {
+        const styleEl = document.createElement('style');
+        styleEl.appendChild(document.createTextNode(''));
+        document.head.appendChild(styleEl);
+        this.styleSheet = styleEl.sheet;
+    }
+
+    async loadLocalFonts() {
+        try {
+            const availableFonts = await window.queryLocalFonts();
+            const list = document.querySelector('.text .text-font-selector');
+            for (const fontData of availableFonts) {
+                const option = document.createElement('option');
+                option.text = fontData.fullName;
+                option.value = fontData.postscriptName;
+                if (fontData.fullName === 'Times New Roman') {
+                    option.selected = true;
+                }
+                list?.appendChild(option);
+            }
+        } catch (err) {
+            console.error(err.name, err.message);
+        }
+    }
+
+    async loadFont(fontFamily, fontScript) {
+        this.styleSheet?.insertRule(
+            `@font-face {
+    font-family: '${fontFamily}';
+    src: local('${fontFamily}'),
+        local('${fontScript}');
+}`
+        );
+
+        const font = new FontFaceObserver(fontFamily);
+        return font.load().then(
+            function () {
+                console.log(`Font ${fontFamily} is available`);
+            },
+            function () {
+                console.log(`Font ${fontFamily} is not available`);
+            }
+        );
+    }
+}
+
+const fonts = new DFonts();
 
 const canvasContainer = document.querySelector('.editor');
 const w = canvasContainer?.clientWidth || 1000;
 const h = canvasContainer?.clientHeight || 1000;
 
-const canvasElement = document.getElementById('canvas') as HTMLCanvasElement;
+const canvasElement = document.getElementById('canvas');
 const canvas = new fabric.Canvas(canvasElement, {
     preserveObjectStacking: true,
 });
@@ -27,7 +77,7 @@ const notControllableOptions = {
     transparentCorners: false,
     centeredScaling: false,
     centeredRotation: false,
-} as any;
+};
 
 const tokenClipPath = new fabric.Circle({
     radius: 160,
@@ -331,9 +381,140 @@ function saveDataURLAsFile(dataURL) {
     a.remove();
 }
 
-// const text = new fabric.Text('fabric.js sandbox', {
-//     originX: 'center',
-//     top: 20,
-// });
-// canvas.add(text);
-// canvas.centerObjectH(text);
+class DTextbox {
+    textbox = null;
+    canvas = null;
+
+    constructor(canvas, text) {
+        this.canvas = canvas;
+        this.textbox = new fabric.Textbox(text, {
+            left: 50,
+            top: 50,
+            width: 150,
+            fontSize: 20,
+            textAlign: 'center',
+        });
+        this.canvas.add(this.textbox);
+        this.canvas.centerObject(this.textbox);
+    }
+
+    remove() {
+        this.canvas.remove(this.textbox);
+        this.canvas.renderAll();
+    }
+
+    setOptions(options) {
+        this.textbox.setOptions({
+            fill: options.color,
+            fontFamily: options.fontFamily,
+            fontSize: options.size,
+        });
+        this.canvas.renderAll();
+    }
+
+    setColor(color) {
+        this.textbox.setOptions({
+            fill: color,
+        });
+        this.canvas.renderAll();
+    }
+
+    setFont(fontFamily) {
+        this.textbox.setOptions({
+            fontFamily: fontFamily,
+        });
+        this.canvas.renderAll();
+    }
+
+    setSize(size) {
+        this.textbox.setOptions({
+            fontSize: size,
+        });
+        this.canvas.renderAll();
+    }
+}
+
+class TextSetting {
+    textbox = null;
+    canvas = null;
+
+    constructor(canvas) {
+        this.canvas = canvas;
+
+        this.fontSelector = document.querySelector('.text-font-selector');
+        this.fontFamily = this.fontSelector.value;
+
+        this.colorInput = document.querySelector('.text-color-input');
+        this.color = this.colorInput.value;
+
+        this.sizeInput = document.querySelector('.text-size-input');
+        this.size = this.sizeInput.value;
+
+        this.addTextButton = document.querySelector('.add-text-button');
+        this.removeTextButton = document.querySelector('.remove-text-button');
+
+        this.listen();
+    }
+
+    addText() {
+        if (this.textbox) return;
+
+        this.textbox = new DTextbox(canvas, 'D&D!');
+        this.updateTextbox();
+    }
+
+    removeText() {
+        if (!this.textbox) return;
+
+        this.textbox.remove();
+        this.textbox = null;
+    }
+
+    updateTextbox() {
+        if (!this.textbox) return;
+
+        this.textbox.setOptions({
+            size: this.size,
+            color: this.color,
+            fontFamily: this.fontFamily,
+        });
+    }
+
+    listen() {
+        this.addTextButton.addEventListener('click', () => {
+            this.addText();
+        });
+
+        this.removeTextButton.addEventListener('click', () => {
+            this.removeText();
+        });
+
+        this.sizeInput?.addEventListener('change', () => {
+            this.size = this.sizeInput.value;
+            this.updateTextbox();
+        });
+
+        this.fontSelector.addEventListener('change', async () => {
+            const fontScript = this.fontSelector?.value;
+            this.fontFamily =
+                this.fontSelector.options[
+                    this.fontSelector.selectedIndex
+                ].textContent;
+
+            fonts.loadFont(this.fontFamily, fontScript).then(() => {
+                this.updateTextbox();
+            });
+        });
+
+        this.colorInput.addEventListener('input', () => {
+            this.color = this.colorInput.value;
+            this.updateTextbox();
+        });
+    }
+}
+
+const textSettings = new TextSetting(canvas);
+
+(async () => {
+    await fonts.loadLocalFonts();
+})();

@@ -157,6 +157,11 @@ ul {
     gap: 1em;
 }
 
+input,
+select {
+    accent-color: var(--color-orange);
+}
+
 input[type="color"].color-input {
     appearance: none;
     -moz-appearance: none;
