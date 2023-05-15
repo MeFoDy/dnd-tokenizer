@@ -16,7 +16,7 @@
             <ul class="header__actions">
                 <li>
                     <button class="header__action pwa-install-button">
-                        Install
+                        Install as PWA
                     </button>
                 </li>
                 <li>
@@ -26,23 +26,26 @@
                 </li>
                 <li>
                     <button class="header__action save-image-button">
-                        Save Image
+                        Save Token
                     </button>
                 </li>
-                <!-- <li><button class="header__action">Dark Mode</button></li> -->
             </ul>
         </header>
         <aside class="aside">
             <section class="aside__section">
                 <details>
-                    <summary>Library</summary>
-                    <div class="tokens">
-                        <ul>
-                            <li>Token 1</li>
-                            <li>Token 2</li>
-                            <li>Token 3</li>
-                        </ul>
-                    </div>
+                    <summary>About</summary>
+                    <p>
+                        Me and my friends love D&D! Sometimes we need to
+                        generate image tokens (a.k.a. avatars) for our
+                        characters or NPCs. This web app is a helper for such
+                        generatings.
+                    </p>
+                    <p>
+                        Load your character image, add a border to it, add some
+                        text, and save your new token for your future games.
+                    </p>
+                    <p>Have a good game!</p>
                 </details>
             </section>
             <section class="aside__section">
@@ -63,7 +66,7 @@
                                 />
                             </label>
                         </div>
-                        <div class="settings__item">
+                        <!-- <div class="settings__item">
                             <input
                                 type="checkbox"
                                 class="border-color-input-toggler"
@@ -79,7 +82,7 @@
                                     value="0"
                                 />
                             </label>
-                        </div>
+                        </div> -->
                         <div class="settings__item">
                             <label class="input-group"
                                 >Mask size:
@@ -119,6 +122,30 @@
                                     <img
                                         src="./assets/chinese.png"
                                         alt="Chinese style border"
+                                    />
+                                </button>
+                            </li>
+                            <li class="borders__card">
+                                <button class="border__selector">
+                                    <img
+                                        src="./assets/basic.png"
+                                        alt="Basic style border"
+                                    />
+                                </button>
+                            </li>
+                            <li class="borders__card">
+                                <button class="border__selector">
+                                    <img
+                                        src="./assets/xmas.png"
+                                        alt="X-Mas style border"
+                                    />
+                                </button>
+                            </li>
+                            <li class="borders__card">
+                                <button class="border__selector">
+                                    <img
+                                        src="./assets/halloween.png"
+                                        alt="Halloween style border"
                                     />
                                 </button>
                             </li>
@@ -175,7 +202,10 @@
                     >
                 </li>
                 <li class="footer__item">
-                    <a href="https://github.com/MeFoDy/dnd-tokenizer" target="_blank" rel="noopener"
+                    <a
+                        href="https://github.com/MeFoDy/dnd-tokenizer"
+                        target="_blank"
+                        rel="noopener"
                         >Edit on GitHub</a
                     >
                 </li>

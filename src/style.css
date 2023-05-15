@@ -90,9 +90,13 @@ ul {
     border-radius: var(--border-radius);
 }
 
-.header__action:hover,
-.header__action:focus {
+.header__action:not(:disabled):is(:hover, :focus) {
     filter: brightness(1.2);
+}
+
+.header__action:disabled {
+    filter: brightness(0.8);
+    cursor: not-allowed;
 }
 
 .pwa-install-button {
@@ -109,6 +113,7 @@ ul {
     border-right: 3px solid var(--color-orange);
     max-height: 100%;
     overflow-y: auto;
+    font-size: var(--font-size-m);
 }
 
 .aside__section details {
@@ -137,6 +142,11 @@ ul {
     border: none;
     padding: var(--gap);
     border-radius: var(--border-radius);
+    transition: scale 0.3s ease;
+}
+
+.border__selector:is(:hover, :focus) {
+    scale: 1.1;
 }
 
 .border__selector img {

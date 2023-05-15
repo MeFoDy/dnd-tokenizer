@@ -1,49 +1,18 @@
 import * as fabric from 'fabric';
 import * as FontFaceObserver from 'fontfaceobserver';
 
-if ('launchQueue' in window) {
-    launchQueue.setConsumer((launchParams) => {
-        handleFiles(launchParams.files);
-    });
-} else {
-    console.error('File Handling API is not supported!');
-}
+const NOT_CONTROLLABLE_OPTIONS = {
+    hasControls: false,
+    hasBorders: false,
+    visible: true,
+    selectable: false,
+    evented: false,
+    transparentCorners: false,
+    centeredScaling: false,
+    centeredRotation: false,
+};
 
-if ('serviceWorker' in navigator) {
-    window.addEventListener('load', async () => {
-        try {
-            await navigator.serviceWorker.register(
-                new URL('../share-target/sharetargetsw.js', import.meta.url),
-                { type: 'module' }
-            );
-        } catch (err) {
-            console.error(err.name, err.message);
-        }
-
-        if (location.search.includes('share-target')) {
-            const keys = await caches.keys();
-            const sharedCache = await caches.open(
-                keys.filter((key) => key.startsWith('share-target'))[0]
-            );
-            const image = await sharedCache.match('shared-image');
-            if (image) {
-                const blob = await image.blob();
-                await sharedCache.delete('shared-image');
-                appendTokenImage(blob);
-            }
-        }
-    });
-}
-
-async function handleFiles(files) {
-    for (const file of files) {
-        const blob = await file.getFile();
-        blob.handle = file;
-        appendTokenImage(blob);
-        // process only first file
-        break;
-    }
-}
+const BORDER_SIZE = 400;
 
 class DFonts {
     constructor() {
@@ -107,342 +76,10 @@ class DFonts {
     }
 }
 
-const fonts = new DFonts();
-
-const canvasContainer = document.querySelector('.editor');
-const w = canvasContainer?.clientWidth || 1000;
-const h = canvasContainer?.clientHeight || 1000;
-
-const canvasElement = document.getElementById('canvas');
-const canvas = new fabric.Canvas(canvasElement, {
-    preserveObjectStacking: true,
-});
-
-canvas.setDimensions({
-    width: w,
-    height: h,
-});
-
-const borderImageFilter = new fabric.filters.HueRotation({
-    rotation: 0,
-});
-
-const notControllableOptions = {
-    hasControls: false,
-    hasBorders: false,
-    visible: true,
-    selectable: false,
-    evented: false,
-    transparentCorners: false,
-    centeredScaling: false,
-    centeredRotation: false,
-};
-
-const tokenClipPath = new fabric.Circle({
-    radius: 160,
-    originY: 'center',
-    originX: 'center',
-    absolutePositioned: true,
-    inverted: true,
-    ...notControllableOptions,
-});
-
-const tokenClipPathPlaceholder = new fabric.Circle({
-    radius: 1600,
-    originY: 'center',
-    originX: 'center',
-    absolutePositioned: true,
-    fill: '#000',
-    opacity: 0.5,
-    clipPath: tokenClipPath,
-    ...notControllableOptions,
-});
-
-let borderImageInstance;
-document.addEventListener('click', function (e) {
-    // process border selection
-    const target = e?.target?.closest('.border__selector');
-
-    if (target) {
-        const imgElement = target.querySelector('img');
-
-        if (borderImageInstance) {
-            canvas.remove(borderImageInstance);
-        }
-
-        if (!canvas.contains(tokenClipPathPlaceholder)) {
-            canvas.add(tokenClipPathPlaceholder);
-            canvas.centerObject(tokenClipPathPlaceholder);
-            canvas.centerObject(tokenClipPath);
-        }
-
-        borderImageInstance = new fabric.Image(imgElement, {
-            hasControls: false,
-            hasBorders: false,
-            visible: true,
-            selectable: false,
-            evented: false,
-            transparentCorners: false,
-            centeredScaling: false,
-            centeredRotation: false,
-        });
-        borderImageInstance.filters.push(borderImageFilter);
-        borderImageInstance.applyFilters();
-        canvas.add(borderImageInstance);
-        canvas.centerObject(borderImageInstance);
-
-        canvas.bringObjectToFront(borderImageInstance);
-    }
-});
-
-// process image adding
-let tokenImageInstance;
-let fileName = 'avatar.png';
-const loadImageButton = document.querySelector('.load-image-button');
-loadImageButton?.addEventListener('click', async function (e) {
-    const fileHandle = await openFileOrFiles();
-    if (!fileHandle) {
-        return;
-    }
-
-    const file = await fileHandle.getFile();
-    fileName = file.name;
-    appendTokenImage(await fileToBlob(file));
-});
-
-const fileToBlob = async (file) =>
-    new Blob([new Uint8Array(await file.arrayBuffer())], { type: file.type });
-
-const openFileOrFiles = async (multiple = false) => {
-    const supportsFileSystemAccess =
-        'showOpenFilePicker' in window &&
-        (() => {
-            try {
-                return window.self === window.top;
-            } catch {
-                return false;
-            }
-        })();
-
-    // If the File System Access API is supported…
-    if (supportsFileSystemAccess) {
-        let fileOrFiles = undefined;
-        try {
-            // Show the file picker, optionally allowing multiple files.
-            fileOrFiles = await showOpenFilePicker({ multiple });
-            if (!multiple) {
-                // Only one file is requested.
-                fileOrFiles = fileOrFiles[0];
-            }
-        } catch (err) {
-            // Fail silently if the user has simply canceled the dialog.
-            if (err.name !== 'AbortError') {
-                console.error(err.name, err.message);
-            }
-        }
-        return fileOrFiles;
-    }
-    // Fallback if the File System Access API is not supported.
-    return new Promise((resolve) => {
-        // Append a new `<input type="file" multiple? />` and hide it.
-        const input = document.createElement('input');
-        input.style.display = 'none';
-        input.type = 'file';
-        document.body.append(input);
-        if (multiple) {
-            input.multiple = true;
-        }
-        // The `change` event fires when the user interacts with the dialog.
-        input.addEventListener('change', () => {
-            // Remove the `<input type="file" multiple? />` again from the DOM.
-            input.remove();
-            // If no files were selected, return.
-            if (!input.files) {
-                return;
-            }
-            // Return all files or just one file.
-            resolve(multiple ? input.files : input.files[0]);
-        });
-        // Show the picker.
-        if ('showPicker' in HTMLInputElement.prototype) {
-            input.showPicker();
-        } else {
-            input.click();
-        }
-    });
-};
-
-const appendTokenImage = (blob) => {
-    const imgElement = document.createElement('img');
-    imgElement.src = URL.createObjectURL(blob);
-    imgElement.onload = function () {
-        if (tokenImageInstance) {
-            canvas.remove(tokenImageInstance);
-        }
-        tokenImageInstance = new fabric.Image(imgElement, {});
-        canvas.add(tokenImageInstance);
-        const scale = Math.min(
-            Math.min(w - 20, tokenImageInstance.width) /
-                tokenImageInstance.width,
-            Math.min(h - 20, tokenImageInstance.height) /
-                tokenImageInstance.height
-        );
-        tokenImageInstance.scale(scale);
-
-        canvas.centerObject(tokenImageInstance);
-        canvas.sendObjectToBack(tokenImageInstance);
-
-        canvas.renderAll();
-    };
-};
-
-document.addEventListener('paste', async (e) => {
-    e.preventDefault();
-    const clipboardItems =
-        typeof navigator?.clipboard?.read === 'function'
-            ? await navigator.clipboard.read()
-            : e.clipboardData.files;
-
-    for (const clipboardItem of clipboardItems) {
-        let blob;
-        if (clipboardItem.type?.startsWith('image/')) {
-            // For files from `e.clipboardData.files`.
-            blob = clipboardItem;
-            appendTokenImage(blob);
-        } else {
-            // For files from `navigator.clipboard.read()`.
-            const imageTypes = clipboardItem.types?.filter((type) =>
-                type.startsWith('image/')
-            );
-            for (const imageType of imageTypes) {
-                blob = await clipboardItem.getType(imageType);
-                appendTokenImage(blob);
-            }
-        }
-    }
-});
-
-// Config
-let isBgEnabled = false;
-const bgColorInput = document.querySelector('.bg-color-input');
-const bgToggler = document.querySelector('.bg-color-input-toggler');
-
-bgColorInput?.addEventListener('input', function (e) {
-    if (!isBgEnabled) return;
-    canvas.backgroundColor = bgColorInput.value;
-    canvas.renderAll();
-});
-bgToggler?.addEventListener('input', function (e) {
-    isBgEnabled = e.target.checked;
-    if (isBgEnabled) {
-        canvas.backgroundColor = bgColorInput.value;
-    } else {
-        canvas.backgroundColor = 'rgba(0,0,0, 0)';
-    }
-    canvas.renderAll();
-});
-
-let isBorderColorEnabled = false;
-const borderColorInput = document.querySelector('.border-color-input');
-const borderColorToggler = document.querySelector(
-    '.border-color-input-toggler'
-);
-borderColorInput?.addEventListener('input', function (e) {
-    borderImageFilter.setOptions({ rotation: borderColorInput.value });
-    borderImageInstance.applyFilters();
-    canvas.renderAll();
-});
-borderColorToggler?.addEventListener('input', function (e) {
-    isBorderColorEnabled = e.target.checked;
-    if (!isBorderColorEnabled) {
-        borderImageFilter.setOptions({ rotation: 0 });
-    } else {
-        borderImageFilter.setOptions({ rotation: borderColorInput.value });
-    }
-    borderImageInstance.applyFilters();
-    canvas.renderAll();
-});
-
-const maskSizeInput = document.querySelector('.mask-size-input');
-maskSizeInput?.addEventListener('input', function (e) {
-    const maskSize = maskSizeInput.value;
-    tokenClipPath.setRadius(maskSize / 2);
-    canvas.renderAll();
-});
-
-const saveImageButton = document.querySelector('.save-image-button');
-saveImageButton?.addEventListener('click', async function () {
-    if (!borderImageInstance || !tokenImageInstance) return;
-
-    canvas.remove(tokenClipPathPlaceholder);
-
-    const borderClipPath = new fabric.Circle({
-        radius: 160,
-        originY: 'center',
-        originX: 'center',
-        absolutePositioned: true,
-        ...notControllableOptions,
-    });
-    canvas.centerObject(borderClipPath);
-    tokenImageInstance.clipPath = borderClipPath;
-
-    let bgBorderClipPath, bgCircle;
-
-    if (isBgEnabled) {
-        bgBorderClipPath = new fabric.Circle({
-            radius: 160,
-            originY: 'center',
-            originX: 'center',
-            absolutePositioned: true,
-        });
-        bgCircle = new fabric.Circle({
-            radius: 400,
-            fill: bgColorInput?.value,
-        });
-        canvas.add(bgCircle);
-        canvas.centerObject(bgBorderClipPath);
-        canvas.centerObject(bgCircle);
-        canvas.sendObjectToBack(bgCircle);
-        bgCircle.clipPath = bgBorderClipPath;
-        canvas.backgroundColor = 'rgba(0,0,0, 0)';
-    }
-
-    canvas.renderAll();
-
-    var dataURL = canvas.toDataURL({
-        format: 'png',
-        left: borderImageInstance.left,
-        top: borderImageInstance.top,
-        width: borderImageInstance.width,
-        height: borderImageInstance.height,
-    });
-    saveDataURLAsFile(dataURL);
-
-    if (isBgEnabled) {
-        canvas.remove(bgBorderClipPath);
-        canvas.remove(bgCircle);
-        canvas.backgroundColor = bgColorInput?.value;
-    }
-    tokenImageInstance.clipPath = undefined;
-    canvas.add(tokenClipPathPlaceholder);
-    canvas.bringObjectToFront(borderImageInstance);
-
-    canvas.renderAll();
-});
-
-function saveDataURLAsFile(dataURL) {
-    var a = document.createElement('a');
-    a.href = dataURL;
-    a.download = 'tokenized_' + fileName;
-    a.hidden = true;
-    saveImageButton?.parentNode?.appendChild(a);
-    a.click();
-    a.remove();
-}
-
 class DTextbox {
     textbox = null;
     canvas = null;
+    maskRadius = 160;
 
     constructor(canvas, text) {
         this.canvas = canvas;
@@ -452,9 +89,38 @@ class DTextbox {
             width: 150,
             fontSize: 20,
             textAlign: 'center',
+            originY: 'center',
+            originX: 'center',
         });
         this.canvas.add(this.textbox);
         this.canvas.centerObject(this.textbox);
+        this.canvas.renderAll();
+    }
+
+    applyMask() {
+        this.borderClipPath = new fabric.Circle({
+            radius: this.maskRadius,
+            originY: 'center',
+            originX: 'center',
+            absolutePositioned: true,
+            ...NOT_CONTROLLABLE_OPTIONS,
+        });
+        this.canvas.centerObject(this.borderClipPath);
+        this.textbox.clipPath = this.borderClipPath;
+        this.textbox.hasControls = false;
+        this.textbox.hasBorders = false;
+    }
+
+    removeMask() {
+        this.textbox.clipPath = undefined;
+        this.textbox.hasControls = true;
+        this.textbox.hasBorders = true;
+        this.textbox.dirty = true;
+        this.canvas.remove(this.borderClipPath);
+    }
+
+    setRadius(radius) {
+        this.maskRadius = radius;
     }
 
     remove() {
@@ -493,12 +159,14 @@ class DTextbox {
     }
 }
 
-class TextSetting {
+class DTextSetting {
     textbox = null;
     canvas = null;
+    maskRadius = 160;
 
-    constructor(canvas) {
+    constructor(canvas, border) {
         this.canvas = canvas;
+        this.border = border;
 
         this.fontSelector = document.querySelector('.text-font-selector');
         this.fontFamily = this.fontSelector.value;
@@ -528,8 +196,10 @@ class TextSetting {
 
         this.syncOptions();
 
-        this.textbox = new DTextbox(canvas, 'D&D!');
+        this.textbox = new DTextbox(this.canvas, 'D&D!');
         this.updateTextbox();
+
+        this.border.up();
     }
 
     removeText() {
@@ -542,11 +212,28 @@ class TextSetting {
     updateTextbox() {
         if (!this.textbox) return;
 
+        this.textbox.setRadius(this.maskRadius);
+
         this.textbox.setOptions({
             size: this.size,
             color: this.color,
             fontFamily: this.fontFamily,
         });
+    }
+
+    setRadius(radius) {
+        this.maskRadius = radius;
+        this.updateTextbox();
+    }
+
+    applyMask() {
+        if (!this.textbox) return;
+        this.textbox.applyMask();
+    }
+
+    removeMask() {
+        if (!this.textbox) return;
+        this.textbox.removeMask();
     }
 
     listen() {
@@ -582,4 +269,636 @@ class TextSetting {
     }
 }
 
-const textSettings = new TextSetting(canvas);
+class DCanvas {
+    constructor(container) {
+        this.container = container;
+
+        const canvasElement = document.getElementById('canvas');
+        this.canvas = new fabric.Canvas(canvasElement, {
+            preserveObjectStacking: true,
+        });
+
+        this.canvas.setDimensions({
+            width: this.container.getWidth(),
+            height: this.container.getHeight(),
+        });
+    }
+
+    getCanvas() {
+        return this.canvas;
+    }
+
+    getContainer() {
+        return this.container;
+    }
+}
+
+class DContainer {
+    constructor() {
+        this.canvasContainer = document.querySelector('.editor');
+        this.width = this.canvasContainer?.clientWidth || 1000;
+        this.height = this.canvasContainer?.clientHeight || 1000;
+    }
+
+    getWidth() {
+        return this.width;
+    }
+
+    getHeight() {
+        return this.height;
+    }
+}
+
+class DBorder {
+    borderInstance = null;
+    maskRadius = 160;
+
+    constructor(canvas) {
+        this.canvas = canvas;
+
+        this.initFilters();
+        this.listen();
+        this.initMask();
+    }
+
+    getBorderInstance() {
+        return this.borderInstance;
+    }
+
+    initFilters() {
+        this.hueFilter = new fabric.filters.HueRotation({
+            rotation: 0,
+        });
+    }
+
+    setRadius(radius) {
+        this.maskRadius = radius;
+        this.syncMask();
+    }
+
+    syncMask() {
+        this.mask.radius = this.maskRadius;
+        this.canvas.renderAll();
+    }
+
+    initMask() {
+        this.mask = new fabric.Circle({
+            radius: this.maskRadius,
+            originY: 'center',
+            originX: 'center',
+            absolutePositioned: true,
+            inverted: true,
+            ...NOT_CONTROLLABLE_OPTIONS,
+        });
+
+        this.maskPlaceholder = new fabric.Circle({
+            radius: this.maskRadius * 10,
+            originY: 'center',
+            originX: 'center',
+            absolutePositioned: true,
+            fill: '#000',
+            opacity: 0.5,
+            clipPath: this.mask,
+            ...NOT_CONTROLLABLE_OPTIONS,
+        });
+    }
+
+    getMask() {
+        return this.mask;
+    }
+
+    getMaskPlaceholder() {
+        return this.maskPlaceholder;
+    }
+
+    setMask() {
+        if (!this.canvas.contains(this.maskPlaceholder)) {
+            this.canvas.add(this.maskPlaceholder);
+            this.canvas.centerObject(this.maskPlaceholder);
+            this.canvas.centerObject(this.mask);
+        }
+
+        this.up();
+    }
+
+    removeMask() {
+        this.canvas.remove(this.maskPlaceholder);
+    }
+
+    setBorder(img) {
+        if (this.borderInstance) {
+            this.canvas.remove(this.borderInstance);
+        }
+
+        this.borderInstance = new fabric.Image(img, {
+            ...NOT_CONTROLLABLE_OPTIONS,
+        });
+
+        this.canvas.add(this.borderInstance);
+        this.canvas.centerObject(this.borderInstance);
+
+        this.up();
+
+        this.setMask();
+        this.applyFilters();
+
+        this.canvas.renderAll();
+
+        this.emit();
+    }
+
+    applyFilters() {
+        this.borderInstance.filters = [this.hueFilter];
+        this.borderInstance.applyFilters();
+    }
+
+    listen() {
+        document.addEventListener('click', (e) => {
+            const target = e?.target?.closest('.border__selector');
+            if (target) {
+                const imgElement = target.querySelector('img');
+                this.setBorder(imgElement);
+            }
+        });
+    }
+
+    subscribe(listener) {
+        this.listener = listener;
+    }
+
+    emit() {
+        if (this.listener) this.listener();
+    }
+
+    up() {
+        this.canvas.bringObjectToFront(this.borderInstance);
+    }
+}
+
+class DToken {
+    tokenInstance = null;
+    canvas = null;
+    maskRadius = 160;
+
+    constructor(editor) {
+        this.editor = editor;
+        this.canvas = this.editor.getCanvas();
+
+        this.listenInputs();
+    }
+
+    listenInputs() {
+        if ('launchQueue' in window) {
+            launchQueue.setConsumer((launchParams) => {
+                this.handleFiles(launchParams.files);
+            });
+        } else {
+            console.error('File Handling API is not supported!');
+        }
+    }
+
+    async handleFiles(files) {
+        for (const file of files) {
+            const blob = await file.getFile();
+            blob.handle = file;
+            this.appendTokenImage(blob);
+            // process only first file
+            break;
+        }
+    }
+
+    appendTokenImage(blob) {
+        const imgElement = document.createElement('img');
+        imgElement.src = URL.createObjectURL(blob);
+        imgElement.onload = () => {
+            if (this.tokenInstance) {
+                this.canvas.remove(this.tokenInstance);
+            }
+            this.tokenInstance = new fabric.Image(imgElement, {});
+            this.canvas.add(this.tokenInstance);
+            const container = this.editor.getContainer();
+            const scale = Math.min(
+                Math.min(container.getWidth() - 20, this.tokenInstance.width) /
+                    this.tokenInstance.width,
+                Math.min(
+                    container.getHeight() - 20,
+                    this.tokenInstance.height
+                ) / this.tokenInstance.height
+            );
+            this.tokenInstance.scale(scale);
+            this.updateToken();
+        };
+    }
+
+    updateToken() {
+        this.canvas.centerObject(this.tokenInstance);
+        this.canvas.sendObjectToBack(this.tokenInstance);
+
+        this.canvas.renderAll();
+    }
+
+    setRadius(radius) {
+        this.maskRadius = radius;
+    }
+
+    applyMask() {
+        if (!this.tokenInstance) return;
+
+        this.borderClipPath = new fabric.Circle({
+            radius: this.maskRadius,
+            originY: 'center',
+            originX: 'center',
+            absolutePositioned: true,
+            ...NOT_CONTROLLABLE_OPTIONS,
+        });
+        this.canvas.centerObject(this.borderClipPath);
+        this.tokenInstance.clipPath = this.borderClipPath;
+        this.tokenInstance.hasControls = false;
+        this.tokenInstance.hasBorders = false;
+    }
+
+    removeMask() {
+        if (!this.tokenInstance) return;
+
+        this.tokenInstance.clipPath = undefined;
+        this.tokenInstance.hasControls = true;
+        this.tokenInstance.hasBorders = true;
+        this.canvas.remove(this.borderClipPath);
+    }
+}
+
+class DBackground {
+    enabled = false;
+
+    constructor(canvas) {
+        this.canvas = canvas;
+
+        this.colorInput = document.querySelector('.bg-color-input');
+        this.toggler = document.querySelector('.bg-color-input-toggler');
+
+        this.listen();
+        this.syncBgColor();
+    }
+
+    enable() {
+        this.toggler.checked = true;
+        this.enabled = true;
+    }
+
+    listen() {
+        this.colorInput.addEventListener('input', () => {
+            this.enable();
+            this.syncBgColor();
+        });
+
+        this.toggler.addEventListener('input', function (e) {
+            this.enabled = e.target.checked;
+
+            if (!this.enabled) {
+                this.canvas.backgroundColor = 'rgba(0,0,0, 0)';
+                this.canvas.renderAll();
+            }
+
+            this.syncBgColor();
+        });
+    }
+
+    syncBgColor() {
+        if (!this.enabled) return;
+
+        this.canvas.backgroundColor = this.colorInput.value;
+        this.canvas.renderAll();
+    }
+
+    setRadius(radius) {
+        this.radius = radius;
+    }
+
+    applyMask() {
+        if (!this.enabled) return;
+
+        this.bgBorderClipPath = new fabric.Circle({
+            radius: this.radius,
+            originY: 'center',
+            originX: 'center',
+            absolutePositioned: true,
+        });
+        this.bgCircle = new fabric.Circle({
+            radius: BORDER_SIZE,
+            fill: this.colorInput?.value,
+        });
+        this.canvas.add(this.bgCircle);
+        this.canvas.centerObject(this.bgBorderClipPath);
+        this.canvas.centerObject(this.bgCircle);
+        this.canvas.sendObjectToBack(this.bgCircle);
+        this.bgCircle.clipPath = this.bgBorderClipPath;
+        this.canvas.backgroundColor = 'rgba(0,0,0, 0)';
+    }
+
+    removeMask() {
+        if (!this.enabled) return;
+
+        this.canvas.remove(this.bgBorderClipPath);
+        this.canvas.remove(this.bgCircle);
+        this.canvas.backgroundColor = this.colorInput?.value;
+
+        this.syncBgColor();
+    }
+}
+
+class DSaveSontroller {
+    fileName = 'avatar.png';
+
+    constructor(canvas, border, token, background, textSettings) {
+        this.canvas = canvas;
+        this.border = border;
+        this.token = token;
+        this.background = background;
+        this.textSettings = textSettings;
+
+        this.saveButton = document.querySelector('.save-image-button');
+        this.listen();
+        this.syncButton();
+    }
+
+    syncButton() {
+        this.saveButton.disabled = !this.border.getBorderInstance();
+    }
+
+    listen() {
+        this.border.subscribe(() => {
+            this.syncButton();
+        });
+
+        this.saveButton.addEventListener('click', async () => {
+            this.save();
+        });
+    }
+
+    save() {
+        const borderImageInstance = this.border.getBorderInstance();
+
+        if (!borderImageInstance) return;
+
+        this.border.removeMask();
+        this.token.applyMask();
+        this.background.applyMask();
+        this.textSettings.applyMask();
+
+        this.canvas.renderAll();
+
+        this.saveFile(borderImageInstance);
+
+        this.textSettings.removeMask();
+        this.background.removeMask();
+        this.border.setMask();
+        this.token.removeMask();
+
+        this.canvas.renderAll();
+    }
+
+    saveFile(borderImageInstance) {
+        var dataURL = this.canvas.toDataURL({
+            format: 'png',
+            left: borderImageInstance.left,
+            top: borderImageInstance.top,
+            width: borderImageInstance.width,
+            height: borderImageInstance.height,
+            enableRetinaScaling: true,
+        });
+        this.saveDataURLAsFile(dataURL);
+    }
+
+    setFileName(fileName) {
+        this.fileName = fileName.replace(/\.[^/.]+$/, '') + '.png';
+    }
+
+    saveDataURLAsFile(dataURL) {
+        var a = document.createElement('a');
+        a.href = dataURL;
+        a.download = 'tokenized_' + this.fileName;
+        a.hidden = true;
+        this.saveButton?.parentNode?.appendChild(a);
+        a.click();
+        a.remove();
+    }
+}
+
+class DLoadController {
+    constructor(token, saveController) {
+        this.token = token;
+        this.saveController = saveController;
+        this.loadButton = document.querySelector('.load-image-button');
+        this.listen();
+    }
+
+    listen() {
+        this.listenLoadButton();
+        this.listenBuffer();
+    }
+
+    listenLoadButton() {
+        this.loadButton.addEventListener('click', async (e) => {
+            const fileHandle = await this.openFileOrFiles();
+            if (!fileHandle) {
+                return;
+            }
+
+            const file = await fileHandle.getFile();
+            this.saveController.setFileName(file.name);
+            this.token.appendTokenImage(await this.fileToBlob(file));
+        });
+    }
+
+    listenBuffer() {
+        document.addEventListener('paste', async (e) => {
+            e.preventDefault();
+            const clipboardItems =
+                typeof navigator?.clipboard?.read === 'function'
+                    ? await navigator.clipboard.read()
+                    : e.clipboardData.files;
+
+            for (const clipboardItem of clipboardItems) {
+                let blob;
+                if (clipboardItem.type?.startsWith('image/')) {
+                    // For files from `e.clipboardData.files`.
+                    blob = clipboardItem;
+                    this.token.appendTokenImage(blob);
+                } else {
+                    // For files from `navigator.clipboard.read()`.
+                    const imageTypes = clipboardItem.types?.filter((type) =>
+                        type.startsWith('image/')
+                    );
+                    for (const imageType of imageTypes) {
+                        blob = await clipboardItem.getType(imageType);
+                        this.token.appendTokenImage(blob);
+                    }
+                }
+            }
+        });
+    }
+
+    openFileOrFiles = async (multiple = false) => {
+        const supportsFileSystemAccess =
+            'showOpenFilePicker' in window &&
+            (() => {
+                try {
+                    return window.self === window.top;
+                } catch {
+                    return false;
+                }
+            })();
+
+        // If the File System Access API is supported…
+        if (supportsFileSystemAccess) {
+            let fileOrFiles = undefined;
+            try {
+                // Show the file picker, optionally allowing multiple files.
+                fileOrFiles = await showOpenFilePicker({ multiple });
+                if (!multiple) {
+                    // Only one file is requested.
+                    fileOrFiles = fileOrFiles[0];
+                }
+            } catch (err) {
+                // Fail silently if the user has simply canceled the dialog.
+                if (err.name !== 'AbortError') {
+                    console.error(err.name, err.message);
+                }
+            }
+            return fileOrFiles;
+        }
+        // Fallback if the File System Access API is not supported.
+        return new Promise((resolve) => {
+            // Append a new `<input type="file" multiple? />` and hide it.
+            const input = document.createElement('input');
+            input.style.display = 'none';
+            input.type = 'file';
+            document.body.append(input);
+            if (multiple) {
+                input.multiple = true;
+            }
+            // The `change` event fires when the user interacts with the dialog.
+            input.addEventListener('change', () => {
+                // Remove the `<input type="file" multiple? />` again from the DOM.
+                input.remove();
+                // If no files were selected, return.
+                if (!input.files) {
+                    return;
+                }
+                // Return all files or just one file.
+                resolve(multiple ? input.files : input.files[0]);
+            });
+            // Show the picker.
+            if ('showPicker' in HTMLInputElement.prototype) {
+                input.showPicker();
+            } else {
+                input.click();
+            }
+        });
+    };
+
+    fileToBlob = async (file) =>
+        new Blob([new Uint8Array(await file.arrayBuffer())], {
+            type: file.type,
+        });
+}
+
+class DMask {
+    radius = 160;
+
+    constructor(canvas, token, border, background, textSettings) {
+        this.canvas = canvas;
+        this.token = token;
+        this.border = border;
+        this.background = background;
+        this.textSettings = textSettings;
+
+        this.sizeInput = document.querySelector('.mask-size-input');
+    }
+
+    listen() {
+        this.sizeInput.addEventListener('input', function (e) {});
+    }
+
+    syncRadius() {
+        const maskSize = maskSizeInput.value;
+        this.radius = maskSize / 2;
+        this.token.setRadius(this.radius);
+        this.border.setRadius(this.radius);
+        this.background.setRadius(this.radius);
+        this.textSettings.setRadius(this.radius);
+
+        this.canvas.renderAll();
+    }
+}
+
+const container = new DContainer();
+const editor = new DCanvas(container);
+const fonts = new DFonts();
+const border = new DBorder(editor.getCanvas());
+const token = new DToken(editor);
+const background = new DBackground(editor.getCanvas());
+const textSettings = new DTextSetting(editor.getCanvas(), border);
+const saveController = new DSaveSontroller(
+    editor.getCanvas(),
+    border,
+    token,
+    background,
+    textSettings
+);
+const loadController = new DLoadController(token, saveController);
+const mask = new DMask(
+    editor.getCanvas(),
+    token,
+    border,
+    background,
+    textSettings
+);
+
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', async () => {
+        try {
+            await navigator.serviceWorker.register(
+                new URL('../share-target/sharetargetsw.js', import.meta.url),
+                { type: 'module' }
+            );
+        } catch (err) {
+            console.error(err.name, err.message);
+        }
+
+        if (location.search.includes('share-target')) {
+            const keys = await caches.keys();
+            const sharedCache = await caches.open(
+                keys.filter((key) => key.startsWith('share-target'))[0]
+            );
+            const image = await sharedCache.match('shared-image');
+            if (image) {
+                const blob = await image.blob();
+                await sharedCache.delete('shared-image');
+                token.appendTokenImage(blob);
+            }
+        }
+    });
+}
+
+// Config
+// let isBorderColorEnabled = false;
+// const borderColorInput = document.querySelector('.border-color-input');
+// const borderColorToggler = document.querySelector(
+//     '.border-color-input-toggler'
+// );
+// borderColorInput?.addEventListener('input', function (e) {
+//     borderImageFilter.setOptions({ rotation: borderColorInput.value });
+//     borderImageInstance.applyFilters();
+//     canvas.renderAll();
+// });
+// borderColorToggler?.addEventListener('input', function (e) {
+//     isBorderColorEnabled = e.target.checked;
+//     if (!isBorderColorEnabled) {
+//         borderImageFilter.setOptions({ rotation: 0 });
+//     } else {
+//         borderImageFilter.setOptions({ rotation: borderColorInput.value });
+//     }
+//     borderImageInstance.applyFilters();
+//     canvas.renderAll();
+// });
