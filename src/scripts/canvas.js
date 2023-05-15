@@ -278,6 +278,17 @@ class DCanvas {
             preserveObjectStacking: true,
         });
 
+        this.listen();
+        this.resize();
+    }
+
+    listen() {
+        window.addEventListener('resize', () => {
+            this.resize();
+        });
+    }
+
+    resize() {
         this.canvas.setDimensions({
             width: this.container.getWidth(),
             height: this.container.getHeight(),
@@ -296,8 +307,19 @@ class DCanvas {
 class DContainer {
     constructor() {
         this.canvasContainer = document.querySelector('.editor');
+        this.resize();
+        this.listen();
+    }
+
+    resize() {
         this.width = this.canvasContainer?.clientWidth || 1000;
         this.height = this.canvasContainer?.clientHeight || 1000;
+    }
+
+    listen() {
+        window.addEventListener('resize', () => {
+            this.resize();
+        });
     }
 
     getWidth() {
