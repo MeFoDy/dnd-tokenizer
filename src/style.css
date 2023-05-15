@@ -17,6 +17,8 @@
 
     --gap: 20px;
     --border-radius: 7px;
+
+    accent-color: var(--color-orange);
 }
 
 a,
@@ -53,10 +55,21 @@ ul {
     height: 60px;
 }
 
+@media (display-mode: window-controls-overlay) { 
+    .header {
+        padding-right: env(titlebar-area-x);
+        padding-left: env(titlebar-area-x);
+        height: calc(env(titlebar-area-height) + 10px);
+    }
+}
+
 .header__title {
     padding: 0;
     margin: 0;
     font-size: var(--font-size-xl);
+    flex: 1;
+    -webkit-app-region: drag;
+    app-region: drag;
 }
 
 .header__actions {
