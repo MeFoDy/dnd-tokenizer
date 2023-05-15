@@ -24,6 +24,21 @@ class DFonts {
             }
         } catch (err) {
             console.error(err.name, err.message);
+            this.loadFallback();
+        }
+    }
+
+    loadFallback() {
+        const list = document.querySelector('.text .text-font-selector');
+        const fallbackFonts = ['Arial', 'Tahoma'];
+        for (let font of fallbackFonts) {
+            const option = document.createElement('option');
+            option.text = font;
+            option.value = font;
+            if (font === 'Arial') {
+                option.selected = true;
+            }
+            list?.appendChild(option);
         }
     }
 
@@ -456,8 +471,18 @@ class TextSetting {
         this.listen();
     }
 
-    addText() {
+    syncOptions() {
+        this.fontFamily = this.fontSelector.value;
+        this.color = this.colorInput.value;
+        this.size = this.sizeInput.value;
+    }
+
+    async addText() {
         if (this.textbox) return;
+
+        await fonts.loadLocalFonts();
+
+        this.syncOptions();
 
         this.textbox = new DTextbox(canvas, 'D&D!');
         this.updateTextbox();
@@ -514,7 +539,3 @@ class TextSetting {
 }
 
 const textSettings = new TextSetting(canvas);
-
-(async () => {
-    await fonts.loadLocalFonts();
-})();
