@@ -57,7 +57,7 @@ ul {
 
 @media (display-mode: window-controls-overlay) { 
     .header {
-        padding-right: env(titlebar-area-x);
+        padding-right: calc(2 * env(titlebar-area-x));
         padding-left: env(titlebar-area-x);
         height: calc(env(titlebar-area-height) + 10px);
     }

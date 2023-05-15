@@ -1,6 +1,50 @@
 import * as fabric from 'fabric';
 import * as FontFaceObserver from 'fontfaceobserver';
 
+if ('launchQueue' in window) {
+    launchQueue.setConsumer((launchParams) => {
+        handleFiles(launchParams.files);
+    });
+} else {
+    console.error('File Handling API is not supported!');
+}
+
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', async () => {
+        try {
+            await navigator.serviceWorker.register(
+                new URL('../share-target/sharetargetsw.js', import.meta.url),
+                { type: 'module' }
+            );
+        } catch (err) {
+            console.error(err.name, err.message);
+        }
+
+        if (location.search.includes('share-target')) {
+            const keys = await caches.keys();
+            const sharedCache = await caches.open(
+                keys.filter((key) => key.startsWith('share-target'))[0]
+            );
+            const image = await sharedCache.match('shared-image');
+            if (image) {
+                const blob = await image.blob();
+                await sharedCache.delete('shared-image');
+                appendTokenImage(blob);
+            }
+        }
+    });
+}
+
+async function handleFiles(files) {
+    for (const file of files) {
+        const blob = await file.getFile();
+        blob.handle = file;
+        appendTokenImage(blob);
+        // process only first file
+        break;
+    }
+}
+
 class DFonts {
     constructor() {
         const styleEl = document.createElement('style');
