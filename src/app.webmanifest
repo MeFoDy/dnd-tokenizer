@@ -4,15 +4,15 @@
     "description": "This simple web app helps to generate image tokens with fancy borders for D&D and another table games characters.",
     "screenshots": [
         {
-            "src": "./screens/test1.jpeg",
+            "src": "./screens/test1.jpg",
             "type": "image/jpeg",
-            "sizes": "800x600",
+            "sizes": "800x583",
             "form_factor": "wide"
         },
         {
-            "src": "./screens/test2.jpeg",
+            "src": "./screens/test2.jpg",
             "type": "image/jpeg",
-            "sizes": "800x600",
+            "sizes": "800x583",
             "form_factor": "wide"
         }
     ],
