@@ -1,0 +1,44 @@
+{
+    "name": "D&D Tokenizer",
+    "short_name": "D&D Tokenizer",
+    "description": "This simple web app helps to generate image tokens with fancy borders for D&D and another table games characters.",
+    "screenshots": [
+        {
+            "src": "./screens/test1.jpeg",
+            "type": "image/jpeg",
+            "sizes": "800x600",
+            "form_factor": "wide"
+        },
+        {
+            "src": "./screens/test2.jpeg",
+            "type": "image/jpeg",
+            "sizes": "800x600",
+            "form_factor": "wide"
+        }
+    ],
+    "theme_color": "#14213D",
+    "background_color": "#14213D",
+    "orientation": "landscape",
+    "display": "standalone",
+    "scope": "/",
+    "start_url": "/",
+    "icons": [
+        { "src": "icons/192.png", "type": "image/png", "sizes": "192x192" },
+        { "src": "icons/512.png", "type": "image/png", "sizes": "512x512" }
+    ],
+    "protocol_handlers": [
+        {
+            "protocol": "web+tokenizer",
+            "url": "/?from=%s"
+        }
+    ],
+    "shortcuts": [
+        {
+            "name": "Create new token",
+            "url": "/"
+        }
+    ],
+    "launch_handler": {
+        "client_mode": "focus-existing"
+    }
+}

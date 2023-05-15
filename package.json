@@ -1,0 +1,27 @@
+{
+  "name": "dnd-tokenizer",
+  "version": "1.0.0",
+  "description": "",
+  "browserslist": "> 0.5%, last 2 versions, not dead",
+  "source": "src/index.html",
+  "scripts": {
+    "start": "parcel",
+    "sw": "workbox generateSW",
+    "clean": "rm -rf dist",
+    "build": "npm run clean && parcel build && npm run sw"
+  },
+  "keywords": [],
+  "author": "https://github.com/mefody",
+  "license": "MIT",
+  "devDependencies": {
+    "@parcel/packager-raw-url": "^2.8.3",
+    "@parcel/transformer-webmanifest": "^2.8.3",
+    "@types/fabric": "^5.3.2",
+    "parcel": "^2.8.3",
+    "workbox-cli": "^6.5.4"
+  },
+  "dependencies": {
+    "fabric": "^6.0.0-beta5",
+    "workbox-window": "^6.5.4"
+  }
+}

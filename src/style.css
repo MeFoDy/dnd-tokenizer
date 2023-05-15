@@ -1,0 +1,217 @@
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+:root {
+    --color-black: #000000;
+    --color-blue: #14213D;
+    --color-orange: #FCA311;
+    --color-gray: #E5E5E5;
+    --color-white: #FFFFFF;
+
+    --font-size-xl: 24px;
+    --font-size-l: 20px;
+    --font-size-m: 16px;
+
+    --gap: 20px;
+    --border-radius: 7px;
+}
+
+a,
+a:visited {
+    color: var(--color-orange);
+}
+
+ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.body {
+    margin: 0;
+    height: 100vh;
+    font-family: Palatino, serif;
+    background-color: var(--color-blue);
+    color: var(--color-gray);
+
+    display: grid;
+    grid-template-areas: 'h h' 'a c' 'f f';
+    grid-template-rows: auto 1fr auto;
+    grid-template-columns: 1fr 2fr;
+}
+
+.header {
+    grid-area: h;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 3px solid var(--color-orange);
+    padding: 0 var(--gap);
+    height: 60px;
+}
+
+.header__title {
+    padding: 0;
+    margin: 0;
+    font-size: var(--font-size-xl);
+}
+
+.header__actions {
+    list-style: none;
+    display: flex;
+}
+
+.header__action {
+    font-family: inherit;
+    background-color: var(--color-orange);
+    color: var(--color-black);
+    cursor: pointer;
+    padding: 0;
+    border: none;
+    font-size: var(--font-size-m);
+    padding: 0.5em 1em;
+    margin-left: var(--gap);
+    border-radius: var(--border-radius);
+}
+
+.header__action:hover,
+.header__action:focus {
+    filter: brightness(1.2);
+}
+
+.pwa-install-button {
+    opacity: 0;
+    transition: opacity 1s ease;
+}
+
+.pwa-install-button.visible {
+    opacity: 1;
+}
+
+.aside {
+    grid-area: a;
+    border-right: 3px solid var(--color-orange);
+    max-height: 100%;
+    overflow-y: auto;
+}
+
+.aside__section details {
+    padding: calc(var(--gap) / 2) var(--gap);
+    border-bottom: 1px solid var(--color-orange);
+}
+
+.aside__section summary {
+    font-size: var(--font-size-l);
+    color: var(--color-orange);
+    cursor: pointer;
+}
+
+.borders__cards {
+    display: grid;
+    grid-gap: var(--gap);
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+}
+
+.border__selector {
+    display: block;
+    font-family: inherit;
+    background-color: transparent;
+    cursor: pointer;
+    padding: 0;
+    border: none;
+    padding: var(--gap);
+    border-radius: var(--border-radius);
+}
+
+.border__selector img {
+    height: 100%;
+    width: 100%;
+    object-fit: contain;
+}
+
+.editor {
+    grid-area: c;
+    position: relative;
+    background-color: var(--color-white);
+    background-image:
+        linear-gradient(45deg, #eee 25%, transparent 25%),
+        linear-gradient(-45deg, #eee 25%, transparent 25%),
+        linear-gradient(45deg, transparent 75%, #eee 75%),
+        linear-gradient(-45deg, transparent 75%, #eee 75%);
+    background-size: 60px 60px;
+    background-position: 0 0, 0 30px, 30px -30px, -30px 0px;
+    overflow: hidden;
+}
+
+#canvas {
+    width: 1000px;
+    height: 1000px;
+}
+
+.input-group {
+    display: inline-flex;
+    align-items: center;
+    gap: 1em;
+}
+
+input[type="color"].color-input {
+    appearance: none;
+    -moz-appearance: none;
+    -webkit-appearance: none;
+    background: none;
+    border: 1px solid var(--color-gray);
+    cursor: pointer;
+    padding: 0;
+    height: 2em;
+    width: 2em;
+    border-radius: 50%;
+    overflow: hidden;
+}
+::-webkit-color-swatch-wrapper {
+    padding: 0;
+}
+::-webkit-color-swatch {
+    border: 0;
+    border-radius: 0;
+}
+::-moz-color-swatch {
+    border: 0;
+}
+
+.footer {
+    height: 40px;
+    grid-area: f;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-top: 3px solid var(--color-orange);
+    padding: 0 var(--gap);
+}
+
+.footer__items {
+    list-style: none;
+    display: flex;
+    align-items: center;
+}
+
+.footer__item {
+    margin-right: var(--gap);
+}
+
+.footer__item:not(:last-child)::after {
+    content: '|';
+    margin-left: var(--gap);
+    color: var(--color-gray);
+    opacity: 0.5;
+}
+
+.settings {
+    padding: var(--gap) 0;
+}
+
+.settings__item:not(:last-child) {
+    margin-bottom: 0.5em;
+}
