@@ -15,6 +15,8 @@ const NOT_CONTROLLABLE_OPTIONS = {
 const BORDER_SIZE = 400;
 
 class DFonts {
+    loaded = false;
+
     constructor() {
         const styleEl = document.createElement('style');
         styleEl.appendChild(document.createTextNode(''));
@@ -23,6 +25,8 @@ class DFonts {
     }
 
     async loadLocalFonts() {
+        if (this.loaded) return;
+
         try {
             const availableFonts = await window.queryLocalFonts();
             const list = document.querySelector('.text .text-font-selector');
@@ -39,6 +43,8 @@ class DFonts {
             console.error(err.name, err.message);
             this.loadFallback();
         }
+
+        this.loaded = true;
     }
 
     loadFallback() {
@@ -180,6 +186,8 @@ class DTextSetting {
         this.addTextButton = document.querySelector('.add-text-button');
         this.removeTextButton = document.querySelector('.remove-text-button');
 
+        this.textSettingsEl = document.querySelector('.text__settings');
+
         this.listen();
     }
 
@@ -191,6 +199,8 @@ class DTextSetting {
 
     async addText() {
         if (this.textbox) return;
+
+        this.textSettingsEl.classList.remove('hidden');
 
         await fonts.loadLocalFonts();
 
@@ -204,6 +214,8 @@ class DTextSetting {
 
     removeText() {
         if (!this.textbox) return;
+
+        this.textSettingsEl.classList.add('hidden');
 
         this.textbox.remove();
         this.textbox = null;
@@ -408,6 +420,8 @@ class DBorder {
     }
 
     setBorder(img) {
+        this.img = img;
+
         if (this.borderInstance) {
             this.canvas.remove(this.borderInstance);
         }
@@ -440,6 +454,14 @@ class DBorder {
             if (target) {
                 const imgElement = target.querySelector('img');
                 this.setBorder(imgElement);
+            }
+        });
+
+        window.addEventListener('resize', () => {
+            if (this.borderInstance) {
+                this.setBorder(this.img);
+                this.removeMask();
+                this.setMask();
             }
         });
     }
@@ -573,7 +595,7 @@ class DBackground {
             this.syncBgColor();
         });
 
-        this.toggler.addEventListener('input', function (e) {
+        this.toggler.addEventListener('input', (e) => {
             this.enabled = e.target.checked;
 
             if (!this.enabled) {

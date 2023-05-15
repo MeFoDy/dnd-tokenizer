@@ -15,18 +15,18 @@
             <h1 class="header__title">D&D Tokenizer</h1>
             <ul class="header__actions">
                 <li>
-                    <button class="header__action pwa-install-button">
-                        Install as PWA
+                    <button class="header__action button pwa-install-button">
+                        <i class="icon icon_install"></i> Install as PWA
                     </button>
                 </li>
                 <li>
-                    <button class="header__action load-image-button">
-                        Load Image
+                    <button class="header__action button load-image-button">
+                        <i class="icon icon_load"></i> Load Image
                     </button>
                 </li>
                 <li>
-                    <button class="header__action save-image-button">
-                        Save Token
+                    <button class="header__action button save-image-button">
+                        <i class="icon icon_save"></i> Save Token
                     </button>
                 </li>
             </ul>
@@ -53,18 +53,18 @@
                     <summary>Settings</summary>
                     <div class="settings">
                         <div class="settings__item">
-                            <input
-                                type="checkbox"
-                                class="bg-color-input-toggler"
-                            />
                             <label class="input-group"
                                 >Background color:
                                 <input
                                     type="color"
                                     class="color-input bg-color-input"
-                                    value="#ffffff"
+                                    value="#00ff66"
                                 />
                             </label>
+                            <input
+                                type="checkbox"
+                                class="bg-color-input-toggler input-checkbox"
+                            />
                         </div>
                         <!-- <div class="settings__item">
                             <input
@@ -157,30 +157,42 @@
                 <details open>
                     <summary>Text</summary>
                     <div class="text">
-                        <button class="add-text-button">Add text</button>
-                        <button class="remove-text-button">Remove text</button>
-                        <select class="text-font-selector"></select>
+                        <div class="text__controls">
+                            <button class="add-text-button button">
+                                <i class="icon icon_plus"></i> Add text
+                            </button>
+                            <button class="remove-text-button button">
+                                <i class="icon icon_minus"></i> Remove text
+                            </button>
+                        </div>
+                        <div class="text__settings hidden">
+                            <div class="select-wrapper">
+                                <select
+                                    class="text-font-selector button select"
+                                ></select>
+                            </div>
 
-                        <label class="input-group"
-                            >Text color:
-                            <input
-                                type="color"
-                                class="color-input text-color-input"
-                                value="#ff0066"
-                            />
-                        </label>
+                            <label class="input-group"
+                                >Text color:
+                                <input
+                                    type="color"
+                                    class="color-input text-color-input"
+                                    value="#ff0066"
+                                />
+                            </label>
 
-                        <label class="input-group"
-                            >Text size:
-                            <input
-                                type="range"
-                                class="text-size-input"
-                                min="5"
-                                max="256"
-                                step="1"
-                                value="24"
-                            />
-                        </label>
+                            <label class="input-group"
+                                >Text size:
+                                <input
+                                    type="range"
+                                    class="input-range text-size-input"
+                                    min="5"
+                                    max="256"
+                                    step="1"
+                                    value="24"
+                                />
+                            </label>
+                        </div>
                     </div>
                 </details>
             </section>

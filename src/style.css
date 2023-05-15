@@ -78,6 +78,11 @@ ul {
 }
 
 .header__action {
+    margin-left: var(--gap);
+}
+
+.button {
+    display: inline-flex;
     font-family: inherit;
     background-color: var(--color-orange);
     color: var(--color-black);
@@ -86,15 +91,14 @@ ul {
     border: none;
     font-size: var(--font-size-m);
     padding: 0.5em 1em;
-    margin-left: var(--gap);
     border-radius: var(--border-radius);
 }
 
-.header__action:not(:disabled):is(:hover, :focus) {
+.button:not(:disabled):is(:hover, :focus) {
     filter: brightness(1.2);
 }
 
-.header__action:disabled {
+.button:disabled {
     filter: brightness(0.8);
     cursor: not-allowed;
 }
@@ -177,12 +181,13 @@ ul {
 .input-group {
     display: inline-flex;
     align-items: center;
-    gap: 1em;
+    gap: 0.5em;
 }
 
 input,
 select {
     accent-color: var(--color-orange);
+    font: inherit;
 }
 
 input[type="color"].color-input {
@@ -209,6 +214,14 @@ input[type="color"].color-input {
     border: 0;
 }
 
+.mask-size-input {
+    background-color: transparent;
+    border: none;
+    color: var(--color-orange);
+    border-bottom: 1px solid var(--color-orange);
+    width: 5em;
+}
+
 .footer {
     height: 40px;
     grid-area: f;
@@ -226,20 +239,99 @@ input[type="color"].color-input {
 }
 
 .footer__item {
-    margin-right: var(--gap);
+    margin-right: calc(var(--gap) / 2);
 }
 
 .footer__item:not(:last-child)::after {
     content: '|';
-    margin-left: var(--gap);
+    margin-left: calc(var(--gap) / 2);
     color: var(--color-gray);
     opacity: 0.5;
 }
 
 .settings {
     padding: var(--gap) 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap);
 }
 
-.settings__item:not(:last-child) {
-    margin-bottom: 0.5em;
+.settings__item {
+    display: inline-flex;
+    gap: calc(var(--gap) / 2);
+}
+
+.input-checkbox {
+    width: 1.5em;
+    height: 1.5em;
+}
+
+.icon {
+    display: inline-block;
+    width: 1em;
+    height: 1em;
+    background-size: 100% 100%;
+    background-position: center center;
+    margin-right: 0.25em;
+}
+
+.icon_install {
+    background-image: url(./svg/folder-down.svg);
+}
+.icon_load {
+    background-image: url(./svg/image.svg);
+}
+.icon_save {
+    background-image: url(./svg/download.svg);
+}
+.icon_plus {
+    background-image: url(./svg/plus.svg);
+}
+.icon_minus {
+    background-image: url(./svg/minus.svg);
+}
+
+.input-range {
+    flex: 1;
+}
+
+.text__controls {
+    margin-top: var(--gap);
+}
+
+.text__settings {
+    margin-top: var(--gap);
+    margin-bottom: var(--gap);
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap);
+}
+
+.hidden {
+    display: none;
+}
+
+.select-wrapper {
+    display: grid;
+    max-width: 100%;
+    grid-template-areas: "select";
+    align-items: center;
+}
+
+.select {
+    appearance: none;
+    width: 100%;
+    grid-area: select;
+}
+
+.select-wrapper::after {
+    content: "";
+    grid-area: select;
+    justify-self: end;
+    width: 0.8em;
+    height: 0.5em;
+    background-color: var(--color-blue);
+    clip-path: polygon(100% 0%, 0 0%, 50% 100%);
+    margin-right: 0.5em;
+    pointer-events: none;
 }
