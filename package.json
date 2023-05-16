@@ -17,6 +17,7 @@
     "@parcel/packager-raw-url": "^2.8.3",
     "@parcel/transformer-webmanifest": "^2.8.3",
     "@types/fabric": "^5.3.2",
+    "parcel-transformer-ogimage": "^1.0.3",
     "workbox-cli": "^6.5.4"
   },
   "dependencies": {
