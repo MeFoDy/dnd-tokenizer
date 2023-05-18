@@ -104,12 +104,18 @@ ul {
 }
 
 .pwa-install-button {
-    opacity: 0;
-    transition: opacity 1s ease;
+    display: none;
+    transition: display 1s ease;
 }
 
-.pwa-install-button.visible {
-    opacity: 1;
+.pwa-install-button_visible {
+    display: inline-flex;
+}
+
+@media (display-mode: standalone), (display-mode: window-controls-overlay) {
+    .pwa-install-button {
+        display: none;
+    }
 }
 
 .aside {

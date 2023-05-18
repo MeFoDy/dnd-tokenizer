@@ -371,8 +371,9 @@ class DBorder {
     }
 
     syncMask() {
-        this.mask.radius = this.maskRadius;
-        this.canvas.renderAll();
+        this.removeMask();
+        this.initMask();
+        this.setMask();
     }
 
     initMask() {
@@ -858,14 +859,18 @@ class DMask {
         this.textSettings = textSettings;
 
         this.sizeInput = document.querySelector('.mask-size-input');
+
+        this.listen();
     }
 
     listen() {
-        this.sizeInput.addEventListener('input', function (e) {});
+        this.sizeInput.addEventListener('input', () => {
+            this.syncRadius();
+        });
     }
 
     syncRadius() {
-        const maskSize = maskSizeInput.value;
+        const maskSize = this.sizeInput.value;
         this.radius = maskSize / 2;
         this.token.setRadius(this.radius);
         this.border.setRadius(this.radius);
