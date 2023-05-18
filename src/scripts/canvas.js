@@ -744,12 +744,11 @@ class DLoadController {
 
     listenLoadButton() {
         this.loadButton.addEventListener('click', async (e) => {
-            const fileHandle = await this.openFileOrFiles();
-            if (!fileHandle) {
+            const file = await this.openFile();
+            if (!file) {
                 return;
             }
 
-            const file = await fileHandle.getFile();
             this.saveController.setFileName(file.name);
             this.token.appendTokenImage(await this.fileToBlob(file));
         });
@@ -783,7 +782,7 @@ class DLoadController {
         });
     }
 
-    openFileOrFiles = async (multiple = false) => {
+    openFile = async () => {
         const supportsFileSystemAccess =
             'showOpenFilePicker' in window &&
             (() => {
@@ -796,42 +795,30 @@ class DLoadController {
 
         // If the File System Access API is supported…
         if (supportsFileSystemAccess) {
-            let fileOrFiles = undefined;
+            let fileHandle = undefined;
             try {
                 // Show the file picker, optionally allowing multiple files.
-                fileOrFiles = await showOpenFilePicker({ multiple });
-                if (!multiple) {
-                    // Only one file is requested.
-                    fileOrFiles = fileOrFiles[0];
-                }
+                [fileHandle] = await showOpenFilePicker();
             } catch (err) {
                 // Fail silently if the user has simply canceled the dialog.
                 if (err.name !== 'AbortError') {
                     console.error(err.name, err.message);
                 }
             }
-            return fileOrFiles;
+            return await fileHandle.getFile();
         }
         // Fallback if the File System Access API is not supported.
         return new Promise((resolve) => {
-            // Append a new `<input type="file" multiple? />` and hide it.
             const input = document.createElement('input');
             input.style.display = 'none';
             input.type = 'file';
             document.body.append(input);
-            if (multiple) {
-                input.multiple = true;
-            }
-            // The `change` event fires when the user interacts with the dialog.
             input.addEventListener('change', () => {
-                // Remove the `<input type="file" multiple? />` again from the DOM.
                 input.remove();
-                // If no files were selected, return.
                 if (!input.files) {
                     return;
                 }
-                // Return all files or just one file.
-                resolve(multiple ? input.files : input.files[0]);
+                resolve(input.files[0]);
             });
             // Show the picker.
             if ('showPicker' in HTMLInputElement.prototype) {
