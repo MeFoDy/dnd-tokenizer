@@ -14,6 +14,18 @@
             "type": "image/jpeg",
             "sizes": "800x583",
             "form_factor": "wide"
+        },
+        {
+            "src": "./screens/mobile1.jpg",
+            "type": "image/jpeg",
+            "sizes": "530x700",
+            "form_factor": "narrow"
+        },
+        {
+            "src": "./screens/mobile2.jpg",
+            "type": "image/jpeg",
+            "sizes": "530x700",
+            "form_factor": "narrow"
         }
     ],
     "theme_color": "#14213D",
