@@ -29,8 +29,10 @@ self.addEventListener('activate', (activateEvent) => {
 });
 
 self.addEventListener('fetch', (fetchEvent) => {
+    const url = new URL(fetchEvent.request.url);
     if (
-        fetchEvent.request.url.endsWith('/share-target/') &&
+        url.pathname === '/' &&
+        url.searchParams.has('share-target') &&
         fetchEvent.request.method === 'POST'
     ) {
         return fetchEvent.respondWith(

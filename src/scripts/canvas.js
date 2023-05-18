@@ -895,7 +895,7 @@ if ('serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
         try {
             await navigator.serviceWorker.register(
-                new URL('../share-target/sharetargetsw.js', import.meta.url),
+                new URL('../sharetargetsw.js', import.meta.url),
                 { type: 'module' }
             );
         } catch (err) {
