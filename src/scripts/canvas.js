@@ -387,7 +387,7 @@ class DBorder {
         });
 
         this.maskPlaceholder = new fabric.Circle({
-            radius: this.maskRadius * 10,
+            radius: Math.max(this.canvas.getWidth(), this.canvas.getHeight()),
             originY: 'center',
             originX: 'center',
             absolutePositioned: true,
