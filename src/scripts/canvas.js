@@ -662,12 +662,28 @@ class DSaveSontroller {
         this.textSettings = textSettings;
 
         this.saveButton = document.querySelector('.save-image-button');
+
+        this.initShareButton();
+
         this.listen();
         this.syncButton();
     }
 
+    initShareButton() {
+        this.shareButton = document.querySelector('.share-image-button');
+
+        if (navigator.canShare) {
+            this.shareButton.classList.remove('hidden');
+
+            this.shareButton.addEventListener('click', async () => {
+                await this.share();
+            });
+        }
+    }
+
     syncButton() {
         this.saveButton.disabled = !this.border.getBorderInstance();
+        this.shareButton.disabled = !this.border.getBorderInstance();
     }
 
     listen() {
@@ -680,20 +696,16 @@ class DSaveSontroller {
         });
     }
 
-    save() {
-        const borderImageInstance = this.border.getBorderInstance();
-
-        if (!borderImageInstance) return;
-
+    beforeSave() {
         this.border.removeMask();
         this.token.applyMask();
         this.background.applyMask();
         this.textSettings.applyMask();
 
         this.canvas.renderAll();
+    }
 
-        this.saveFile(borderImageInstance);
-
+    afterSave() {
         this.textSettings.removeMask();
         this.background.removeMask();
         this.border.setMask();
@@ -702,8 +714,34 @@ class DSaveSontroller {
         this.canvas.renderAll();
     }
 
-    saveFile(borderImageInstance) {
-        var dataURL = this.canvas.toDataURL({
+    save() {
+        const borderImageInstance = this.border.getBorderInstance();
+
+        this.beforeSave();
+
+        if (!borderImageInstance) return;
+
+        const dataUrl = this.getDataUrlFromBorder(borderImageInstance);
+        this.saveDataURLAsFile(dataUrl);
+
+        this.afterSave();
+    }
+
+    async share() {
+        const borderImageInstance = this.border.getBorderInstance();
+
+        this.beforeSave();
+
+        if (!borderImageInstance) return;
+
+        const dataUrl = this.getDataUrlFromBorder(borderImageInstance);
+        await this.shareFile(dataUrl);
+
+        this.afterSave();
+    }
+
+    getDataUrlFromBorder(borderImageInstance) {
+        return this.canvas.toDataURL({
             format: 'png',
             left: borderImageInstance.left,
             top: borderImageInstance.top,
@@ -711,7 +749,27 @@ class DSaveSontroller {
             height: borderImageInstance.height,
             enableRetinaScaling: true,
         });
-        this.saveDataURLAsFile(dataURL);
+    }
+
+    async shareFile(dataURL) {
+        const blob = this.getBlobFromDataURL(dataURL);
+        const fileName = this.fileName;
+        const file = new File([blob], fileName, {
+            type: 'image/png',
+        });
+        const data = {
+            files: [file],
+        };
+        if (navigator.canShare(data)) {
+            try {
+                await navigator.share(data);
+            } catch (err) {
+                if (err.name !== 'AbortError') {
+                    console.error(err.name, err.message);
+                    showToast(err.message);
+                }
+            }
+        }
     }
 
     setFileName(fileName) {
@@ -726,6 +784,17 @@ class DSaveSontroller {
         this.saveButton?.parentNode?.appendChild(a);
         a.click();
         a.remove();
+    }
+
+    getBlobFromDataURL(dataURL) {
+        const byteString = atob(dataURL.split(',')[1]);
+        const mimeString = dataURL.split(',')[0].split(':')[1].split(';')[0];
+        const ab = new ArrayBuffer(byteString.length);
+        const ia = new Uint8Array(ab);
+        for (let i = 0; i < byteString.length; i++) {
+            ia[i] = byteString.charCodeAt(i);
+        }
+        return new Blob([ab], { type: mimeString });
     }
 }
 

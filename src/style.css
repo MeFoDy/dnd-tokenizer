@@ -297,6 +297,9 @@ input[type="color"].color-input {
 .icon_minus {
     background-image: url(./svg/minus.svg);
 }
+.icon_upload {
+    background-image: url(./svg/upload.svg);
+}
 
 .input-range {
     flex: 1;

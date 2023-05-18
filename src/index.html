@@ -59,6 +59,11 @@
                         <i class="icon icon_save"></i> Save Token
                     </button>
                 </li>
+                <li>
+                    <button class="header__action button share-image-button hidden">
+                        <i class="icon icon_upload"></i> Share
+                    </button>
+                </li>
             </ul>
         </header>
         <aside class="aside">
@@ -257,9 +262,7 @@
         <script src="./scripts/canvas.js" type="module"></script>
 
         <script>
-            // Control Install PWA Button
             const installButton = document.querySelector('.pwa-install-button');
-
             if ('BeforeInstallPromptEvent' in window) {
                 let installEvent = null;
                 const onInstall = () => {
