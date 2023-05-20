@@ -766,14 +766,13 @@ class DSaveSontroller {
             } catch (err) {
                 if (err.name !== 'AbortError') {
                     console.error(err.name, err.message);
-                    showToast(err.message);
                 }
             }
         }
     }
 
     setFileName(fileName) {
-        this.fileName = fileName.replace(/\.[^/.]+$/, '') + '.png';
+        this.fileName = fileName.replace(/\.[^/.]+$/, '') + '_token.png';
     }
 
     saveDataURLAsFile(dataURL) {
