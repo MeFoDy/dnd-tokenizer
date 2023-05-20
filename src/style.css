@@ -318,7 +318,7 @@ input[type="color"].color-input {
     gap: var(--gap);
 }
 
-.hidden {
+.hidden:not(#not_exist) {
     display: none;
 }
 
