@@ -92,25 +92,27 @@
                     <summary>Settings</summary>
                     <div class="settings">
                         <div class="settings__item">
-                            <label class="input-group"
-                                >Background color:
+                            <div class="input-group">
+                                <label
+                                    >Background color:
+                                    <input
+                                        type="color"
+                                        class="color-input bg-color-input"
+                                        value="#00ff66"
+                                    />
+                                </label>
                                 <input
-                                    type="color"
-                                    class="color-input bg-color-input"
-                                    value="#00ff66"
+                                    type="checkbox"
+                                    class="bg-color-input-toggler input-checkbox"
                                 />
-                            </label>
-                            <input
-                                type="checkbox"
-                                class="bg-color-input-toggler input-checkbox"
-                            />
+                            </div>
                         </div>
                         <!-- <div class="settings__item">
                             <input
                                 type="checkbox"
                                 class="border-color-input-toggler"
                             />
-                            <label class="input-group"
+                            <label
                                 >Border color:
                                 <input
                                     type="range"
@@ -123,14 +125,16 @@
                             </label>
                         </div> -->
                         <div class="settings__item">
-                            <label class="input-group"
-                                >Mask size:
-                                <input
-                                    type="number"
-                                    class="mask-size-input"
-                                    value="320"
-                                />
-                            </label>
+                            <div class="input-group">
+                                <label
+                                    >Mask size:
+                                    <input
+                                        type="number"
+                                        class="mask-size-input"
+                                        value="320"
+                                    />
+                                </label>
+                            </div>
                         </div>
                     </div>
                 </details>
@@ -210,27 +214,29 @@
                                     class="text-font-selector button select"
                                 ></select>
                             </div>
-
-                            <label class="input-group"
-                                >Text color:
-                                <input
-                                    type="color"
-                                    class="color-input text-color-input"
-                                    value="#ff0066"
-                                />
-                            </label>
-
-                            <label class="input-group"
-                                >Text size:
-                                <input
-                                    type="range"
-                                    class="input-range text-size-input"
-                                    min="5"
-                                    max="256"
-                                    step="1"
-                                    value="24"
-                                />
-                            </label>
+                            <div class="input-group">
+                                <label
+                                    >Text color:
+                                    <input
+                                        type="color"
+                                        class="color-input text-color-input"
+                                        value="#ff0066"
+                                    />
+                                </label>
+                            </div>
+                            <div class="input-group">
+                                <label
+                                    >Text size:
+                                    <input
+                                        type="range"
+                                        class="input-range text-size-input"
+                                        min="5"
+                                        max="256"
+                                        step="1"
+                                        value="24"
+                                    />
+                                </label>
+                            </div>
                         </div>
                     </div>
                 </details>
