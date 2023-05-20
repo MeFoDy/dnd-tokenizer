@@ -45,7 +45,9 @@
             <h1 class="header__title">D&D Tokenizer</h1>
             <ul class="header__actions">
                 <li>
-                    <button class="header__action button pwa-install-button pwa-install-button_visible">
+                    <button
+                        class="header__action button pwa-install-button pwa-install-button_visible"
+                    >
                         <i class="icon icon_install"></i> Install as PWA
                     </button>
                 </li>
@@ -60,7 +62,9 @@
                     </button>
                 </li>
                 <li>
-                    <button class="header__action button share-image-button hidden">
+                    <button
+                        class="header__action button share-image-button hidden"
+                    >
                         <i class="icon icon_upload"></i> Share
                     </button>
                 </li>
@@ -291,6 +295,21 @@
                     onInstall();
                 });
             }
+
+            async function showHideInstallButton() {
+                if ('getInstalledRelatedApps' in navigator) {
+                    const relatedApps =
+                        await navigator.getInstalledRelatedApps();
+                    const PWAisInstalled = relatedApps.length > 0;
+                    if (PWAisInstalled) {
+                        installButton.disabled = true;
+                        installButton.classList.add('hidden');
+                    }
+                }
+            }
+            (async () => {
+                await showHideInstallButton();
+            })();
         </script>
 
         <script type="module">

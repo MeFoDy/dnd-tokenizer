@@ -34,6 +34,12 @@
     "display": "standalone",
     "scope": "/",
     "start_url": "/",
+    "related_applications": [
+        {
+            "platform": "webapp",
+            "url": "https://dnd-tokenizer-41471e.netlify.app/app.webmanifest"
+        }
+    ],
     "icons": [
         { "src": "icons/192.png", "type": "image/png", "sizes": "192x192" },
         { "src": "icons/512.png", "type": "image/png", "sizes": "512x512" }
