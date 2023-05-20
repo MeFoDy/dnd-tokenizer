@@ -30,7 +30,7 @@
     ],
     "theme_color": "#14213D",
     "background_color": "#14213D",
-    "orientation": "landscape",
+    "orientation": "portrait",
     "display": "standalone",
     "scope": "/",
     "start_url": "/",

@@ -350,8 +350,13 @@ input[type="color"].color-input {
 @media (width < 860px) {
     .body {
         grid-template-areas: 'h h' 'a a' 'c c' 'f f';
-        grid-template-rows: auto auto 100vw auto;
+        grid-template-rows: auto auto auto auto;
         height: auto;
+    }
+
+    .editor {
+        max-height: 90vh;
+        height: 100vw;
     }
 
     .header {
