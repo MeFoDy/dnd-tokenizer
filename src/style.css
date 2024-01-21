@@ -45,6 +45,21 @@ ul {
     grid-template-columns: 1fr 2fr;
 }
 
+.body.body_drop::after {
+    content: "Drop Image Here";
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    color: var(--color-orange);
+    background: rgba(0 0 0 / 0.7);
+    border: 5px dashed;
+    font-size: calc(var(--font-size-xl) * 3);
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+}
+
 .header {
     grid-area: h;
     display: flex;

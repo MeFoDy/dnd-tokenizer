@@ -568,6 +568,7 @@ class DToken {
                 ) / this.tokenInstance.height
             );
             this.tokenInstance.scale(scale);
+            this.canvas.setActiveObject(this.tokenInstance);
             this.updateToken();
         };
     }
@@ -839,12 +840,49 @@ class DLoadController {
         this.token = token;
         this.saveController = saveController;
         this.loadButton = document.querySelector('.load-image-button');
+        this.dropArea = document.querySelector('.body');
         this.listen();
     }
 
     listen() {
         this.listenLoadButton();
         this.listenBuffer();
+        this.listenDragAndDrop();
+    }
+
+    listenDragAndDrop() {
+        const preventDefaults = (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+        };
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach((eventName) => {
+            this.dropArea.addEventListener(eventName, preventDefaults, false);
+        });
+
+        const highlight = (e) => {
+            this.dropArea.classList.add('body_drop');
+        };
+        const unhighlight = (e) => {
+            this.dropArea.classList.remove('body_drop');
+        };
+        ['dragenter', 'dragover'].forEach((eventName) => {
+            this.dropArea.addEventListener(eventName, highlight, false);
+        });
+        ['dragleave', 'drop'].forEach((eventName) => {
+            this.dropArea.addEventListener(eventName, unhighlight, false);
+        });
+
+        const handleDrop = async (e) => {
+            const files = e.dataTransfer.files;
+            const file = files[0];
+            if (!file) {
+                return;
+            }
+
+            this.saveController.setFileName(file.name);
+            this.token.appendTokenImage(await this.fileToBlob(file));
+        };
+        this.dropArea.addEventListener('drop', handleDrop, false);
     }
 
     listenLoadButton() {

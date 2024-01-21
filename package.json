@@ -7,7 +7,7 @@
   "scripts": {
     "start": "parcel",
     "sw": "workbox generateSW",
-    "clean": "rm -rf dist",
+    "clean": "rm -rf dist .parcel-cache",
     "build": "npm run clean && parcel build && npm run sw"
   },
   "keywords": [],
