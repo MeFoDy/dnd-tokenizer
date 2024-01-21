@@ -345,10 +345,18 @@ class DContainer {
 
 class DBorder {
     borderInstance = null;
+    borderColorInput = null;
+    borderColorToggler = null;
+    isBorderColorEnabled = false;
     maskRadius = 160;
 
     constructor(canvas) {
         this.canvas = canvas;
+
+        this.borderColorInput = document.querySelector('.border-color-input');
+        this.borderColorToggler = document.querySelector(
+            '.border-color-input-toggler'
+        );
 
         this.initFilters();
         this.listen();
@@ -357,6 +365,16 @@ class DBorder {
 
     getBorderInstance() {
         return this.borderInstance;
+    }
+
+    setBorderHue(hue) {
+        this.hueFilter = new fabric.filters.HueRotation({
+            rotation: hue,
+        });
+        if (this.borderInstance) {
+            this.applyFilters();
+            this.canvas.renderAll();
+        }
     }
 
     initFilters() {
@@ -420,16 +438,17 @@ class DBorder {
         this.canvas.remove(this.maskPlaceholder);
     }
 
-    setBorder(img) {
-        this.img = img;
-
+    async setBorder(imgSrc) {
         if (this.borderInstance) {
             this.canvas.remove(this.borderInstance);
         }
 
-        this.borderInstance = new fabric.Image(img, {
-            ...NOT_CONTROLLABLE_OPTIONS,
-        });
+        if (this.imgSrc !== imgSrc) {
+            this.imgSrc = imgSrc;
+            this.borderInstance = await fabric.Image.fromURL(this.imgSrc, {
+                ...NOT_CONTROLLABLE_OPTIONS,
+            });
+        }
 
         this.canvas.add(this.borderInstance);
         this.canvas.centerObject(this.borderInstance);
@@ -445,24 +464,42 @@ class DBorder {
     }
 
     applyFilters() {
-        this.borderInstance.filters = [this.hueFilter];
+        this.borderInstance.filters = [];
+        this.borderInstance.filters.push(this.hueFilter);
         this.borderInstance.applyFilters();
     }
 
     listen() {
-        document.addEventListener('click', (e) => {
+        document.addEventListener('click', async (e) => {
             const target = e?.target?.closest('.border__selector');
             if (target) {
                 const imgElement = target.querySelector('img');
-                this.setBorder(imgElement);
+                await this.setBorder(imgElement.currentSrc);
             }
         });
 
-        window.addEventListener('resize', () => {
+        window.addEventListener('resize', async () => {
             if (this.borderInstance) {
-                this.setBorder(this.img);
+                await this.setBorder(this.imgSrc);
                 this.removeMask();
                 this.setMask();
+            }
+        });
+
+        this.borderColorInput?.addEventListener('input', (e) => {
+            this.isBorderColorEnabled = true;
+            this.borderColorToggler &&
+                (this.borderColorToggler.checked = this.isBorderColorEnabled);
+
+            this.setBorderHue(this.borderColorInput.value);
+        });
+
+        this.borderColorToggler?.addEventListener('input', (e) => {
+            this.isBorderColorEnabled = e.target.checked;
+            if (!this.isBorderColorEnabled) {
+                this.setBorderHue(0);
+            } else {
+                this.setBorderHue(this.borderColorInput.value);
             }
         });
     }
@@ -984,25 +1021,3 @@ if ('serviceWorker' in navigator) {
         }
     });
 }
-
-// Config
-// let isBorderColorEnabled = false;
-// const borderColorInput = document.querySelector('.border-color-input');
-// const borderColorToggler = document.querySelector(
-//     '.border-color-input-toggler'
-// );
-// borderColorInput?.addEventListener('input', function (e) {
-//     borderImageFilter.setOptions({ rotation: borderColorInput.value });
-//     borderImageInstance.applyFilters();
-//     canvas.renderAll();
-// });
-// borderColorToggler?.addEventListener('input', function (e) {
-//     isBorderColorEnabled = e.target.checked;
-//     if (!isBorderColorEnabled) {
-//         borderImageFilter.setOptions({ rotation: 0 });
-//     } else {
-//         borderImageFilter.setOptions({ rotation: borderColorInput.value });
-//     }
-//     borderImageInstance.applyFilters();
-//     canvas.renderAll();
-// });

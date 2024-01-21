@@ -1,44 +1,44 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
     <head>
-        <meta charset="UTF-8" />
-        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>D&D Tokenizer</title>
-        <link rel="icon" href="./icons/180.png" type="image/png" />
-        <link rel="apple-touch-icon" href="./icons/180.png" />
-        <meta name="theme-color" content="#14213D" />
-        <meta name="color-scheme" content="dark" />
+        <link rel="icon" href="./icons/180.png" type="image/png">
+        <link rel="apple-touch-icon" href="./icons/180.png">
+        <meta name="theme-color" content="#14213D">
+        <meta name="color-scheme" content="dark">
 
         <meta
             name="description"
             content="Generate image tokens with fancy borders for D&D and other table games characters. Perfect for adding visuality to your gaming experience."
-        />
-        <meta name="author" content="Nikita Dubko" />
+        >
+        <meta name="author" content="Nikita Dubko">
 
-        <meta property="og:title" content="D&D Tokenizer" />
-        <meta property="og:type" content="website" />
+        <meta property="og:title" content="D&D Tokenizer">
+        <meta property="og:type" content="website">
         <meta
             property="og:url"
             content="https://dnd-tokenizer-41471e.netlify.app"
-        />
-        <meta property="og:image" content="./screens/test1.jpg" />
+        >
+        <meta property="og:image" content="./screens/test1.jpg">
         <meta
             property="og:description"
             content="Generate image tokens with fancy borders for D&D and other table games characters. Perfect for adding visuality to your gaming experience."
-        />
+        >
 
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:creator" content="@dark_mefody" />
-        <meta name="twitter:title" content="D&D Tokenizer" />
+        <meta name="twitter:card" content="summary_large_image">
+        <meta name="twitter:creator" content="@dark_mefody">
+        <meta name="twitter:title" content="D&D Tokenizer">
         <meta
             name="twitter:description"
             content="Generate image tokens with fancy borders for D&D and other table games characters. Perfect for adding visuality to your gaming experience."
-        />
-        <meta name="twitter:image" content="./screens/test1.jpg" />
+        >
+        <meta name="twitter:image" content="./screens/test1.jpg">
 
-        <link rel="manifest" href="./app.webmanifest" />
-        <link rel="stylesheet" href="./style.css" />
+        <link rel="manifest" href="./app.webmanifest">
+        <link rel="stylesheet" href="./style.css">
     </head>
     <body class="body">
         <header class="header">
@@ -99,31 +99,33 @@
                                         type="color"
                                         class="color-input bg-color-input"
                                         value="#00ff66"
-                                    />
+                                    >
                                 </label>
                                 <input
                                     type="checkbox"
                                     class="bg-color-input-toggler input-checkbox"
-                                />
+                                >
                             </div>
                         </div>
-                        <!-- <div class="settings__item">
-                            <input
-                                type="checkbox"
-                                class="border-color-input-toggler"
-                            />
-                            <label
-                                >Border color:
+                        <div class="settings__item">
+                            <div class="input-group">
+                                <label
+                                    >Border color:
+                                    <input
+                                        type="range"
+                                        class="border-color-input"
+                                        min="-1"
+                                        max="1"
+                                        step="0.005"
+                                        value="0"
+                                    >
+                                </label>
                                 <input
-                                    type="range"
-                                    class="border-color-input"
-                                    min="-1"
-                                    max="1"
-                                    step="0.005"
-                                    value="0"
-                                />
-                            </label>
-                        </div> -->
+                                    type="checkbox"
+                                    class="border-color-input-toggler input-checkbox"
+                                >
+                            </div>
+                        </div>
                         <div class="settings__item">
                             <div class="input-group">
                                 <label
@@ -132,7 +134,7 @@
                                         type="number"
                                         class="mask-size-input"
                                         value="320"
-                                    />
+                                    >
                                 </label>
                             </div>
                         </div>
@@ -149,7 +151,7 @@
                                     <img
                                         src="./assets/dragon.png"
                                         alt="Dragon style border"
-                                    />
+                                    >
                                 </button>
                             </li>
                             <li class="borders__card">
@@ -157,7 +159,7 @@
                                     <img
                                         src="./assets/greek.png"
                                         alt="Greek style border"
-                                    />
+                                    >
                                 </button>
                             </li>
                             <li class="borders__card">
@@ -165,7 +167,7 @@
                                     <img
                                         src="./assets/chinese.png"
                                         alt="Chinese style border"
-                                    />
+                                    >
                                 </button>
                             </li>
                             <li class="borders__card">
@@ -173,7 +175,7 @@
                                     <img
                                         src="./assets/basic.png"
                                         alt="Basic style border"
-                                    />
+                                    >
                                 </button>
                             </li>
                             <li class="borders__card">
@@ -181,7 +183,7 @@
                                     <img
                                         src="./assets/xmas.png"
                                         alt="X-Mas style border"
-                                    />
+                                    >
                                 </button>
                             </li>
                             <li class="borders__card">
@@ -189,7 +191,7 @@
                                     <img
                                         src="./assets/halloween.png"
                                         alt="Halloween style border"
-                                    />
+                                    >
                                 </button>
                             </li>
                         </ul>
@@ -221,7 +223,7 @@
                                         type="color"
                                         class="color-input text-color-input"
                                         value="#ff0066"
-                                    />
+                                    >
                                 </label>
                             </div>
                             <div class="input-group">
@@ -234,7 +236,7 @@
                                         max="256"
                                         step="1"
                                         value="24"
-                                    />
+                                    >
                                 </label>
                             </div>
                         </div>

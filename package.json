@@ -14,16 +14,17 @@
   "author": "https://github.com/mefody",
   "license": "MIT",
   "devDependencies": {
+    "@awmottaz/prettier-plugin-void-html": "^1.5.0",
     "@parcel/packager-raw-url": "^2.8.3",
     "@parcel/transformer-webmanifest": "^2.8.3",
-    "@types/fabric": "^5.3.2",
     "parcel-transformer-ogimage": "^1.0.3",
+    "prettier": "3.2.2",
     "workbox-cli": "^6.5.4"
   },
   "dependencies": {
-    "fabric": "^6.0.0-beta5",
+    "fabric": "^6.0.0-beta17",
     "fontfaceobserver": "^2.3.0",
-    "parcel": "^2.8.3",
+    "parcel": "^2.11.0",
     "workbox-window": "^6.5.4"
   }
 }
